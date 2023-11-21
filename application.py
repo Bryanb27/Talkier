@@ -1,6 +1,10 @@
 from flask import Flask
-application = Flask(__name__)
 
-@application.route('/')
-def hello_world():
-    return 'Sup. Subscribe'
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return 'Hello, World!'
+
+if __name__ == '__main__':
+    app.run()
