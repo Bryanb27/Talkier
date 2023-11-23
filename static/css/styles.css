@@ -1,0 +1,6 @@
+.bg-image {
+  background-image: url("../Main_Page.jpg");
+  background-size: cover;
+  background-position: center;
+  height: 300px; /* Adjust the height as needed */
+}
