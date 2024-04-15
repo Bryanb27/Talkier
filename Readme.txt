@@ -23,6 +23,3 @@ Este repositório contém o código-fonte e a documentação associada ao meu Tr
 ## Instalação e Configuração
 
 ## Uso
-
-## Licença
-Este projeto está licenciado sob a [Licença MIT](https://opensource.org/licenses/MIT) - veja o arquivo [LICENSE](LICENSE) para mais detalhes.

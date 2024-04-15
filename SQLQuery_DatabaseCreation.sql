@@ -1,4 +1,4 @@
--- Criação da tabela User
+-- Criacao da tabela User
 CREATE TABLE [User] (
     id INT PRIMARY KEY IDENTITY,
     username NVARCHAR(100) UNIQUE NOT NULL,
@@ -6,14 +6,14 @@ CREATE TABLE [User] (
     password_hash VARBINARY(100) NOT NULL
 );
 
--- Criação da tabela Group
+-- Criacao da tabela Group
 CREATE TABLE [Group] (
     id INT PRIMARY KEY IDENTITY,
     name NVARCHAR(100) NOT NULL,
     join_code NVARCHAR(100) NOT NULL
 );
 
--- Criação da tabela Message
+-- Criacao da tabela Message
 CREATE TABLE Message (
     id INT PRIMARY KEY IDENTITY,
     content NVARCHAR(255) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE Message (
     FOREIGN KEY (group_id) REFERENCES [Group](id)
 );
 
--- Criação da tabela UserGroup
+-- Criacao da tabela UserGroup
 CREATE TABLE UserGroup (
     user_id INT,
     group_id INT,
