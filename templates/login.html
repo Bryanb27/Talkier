@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
+  </head>
+  <body>
+    <!-- Formulario para Fazer Login -->
+    <form id="loginForm" action="/login" method="post">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password">
+      <button type="submit">Login</button>
+      <button type="submit" name="create_new_user">Criar Conta</button>
+      {% if login_error %}
+      <p style="color: red;">{{ login_error }}</p>
+      {% endif %}
+    </form>
+  </body>
+</html>

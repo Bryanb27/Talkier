@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Chat</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='chat.css') }}">
+</head>
+<body>
+  <!-- Printar mensagens -->
+  <ul id="messages">
+    {% for message in messages %}
+      <li>
+        <span>{{ message[1] }}</span> 
+        <span>{{ message[2].strftime('%H:%M') }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+  <!-- Formulario para enviar mensagem -->
+  <form id="form" action="/send_message" method="post">
+    <select id="group-selector" name="group_id">
+      {% for group in groups %}
+      <option value="{{ group.id }}">{{ group[0] }}</option>
+      {% endfor %}
+    </select>
+    <input type="text" id="message" name="message" autocomplete="off" />
+    <input type="hidden" id="group_id" name="group_id" value="{{ group_id }}">
+    <button id="send-message-btn" type="submit">Send</button>
+    <a href="/home">Home</a>
+  </form>
+</body>
+</html>
