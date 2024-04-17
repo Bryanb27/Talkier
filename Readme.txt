@@ -8,6 +8,7 @@ Este repositório contém o código-fonte e a documentação associada ao meu Tr
 - Azure Container Registry
 - Azure SQL
 - Azure Web App
+-
 
 ## Programas Utilizados
 - Visual Studio Code
