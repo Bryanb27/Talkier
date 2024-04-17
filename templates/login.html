@@ -1,22 +1,50 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
-  </head>
-  <body>
-    <!-- Formulario para Fazer Login -->
-    <form id="loginForm" action="/login" method="post">
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username">
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password">
-      <button type="submit">Login</button>
-      <button type="submit" name="create_new_user">Criar Conta</button>
-      {% if login_error %}
-      <p style="color: red;">{{ login_error }}</p>
-      {% endif %}
-    </form>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Seu arquivo CSS personalizado -->
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+  <section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+          <div class="container p-5 my-5 bg-dark text-white">
+            <div class="card-body p-5 text-center">
+              <div class="mb-md-5 mt-md-4 pb-5">
+                <h2 class="fw-bold mb-2 text-uppercase">Chatter</h2>
+                <p class="text-white-50 mb-5">Please enter your login and password!</p>
+                <!-- Formulário de Login -->
+                <div data-mdb-input-init class="form-outline form-white mb-4">
+                <form action="/login" method="post">
+                    <input type="text" id="username" name="username" class="form-control form-control-lg" placeholder="Username">
+                    <label class="form-label" for="username">Username</label>
+                </div>
+                <div data-mdb-input-init class="form-outline form-white mb-4">
+                  <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="Password">
+                  <label class="form-label" for="password">Password</label>
+                </div>
+
+                <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+                  
+                <div>
+                  <p class="mb-0 me-2">Don't have an account?<button type="submit" name="create_new_user" class="text-white-50 fw-bold">Sign Up</button></p>
+                </div>
+                {% if login_error %}
+                <p style="color: red;">{{ login_error }}</p>
+                {% endif %}
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </section>
+</body>
 </html>
