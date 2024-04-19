@@ -13,6 +13,23 @@ def is_email_address_valid(email):
     response = kbx.verify(email)
     return response.body['result'] != "undeliverable"
 
+# Impedir url injection
+def user_has_permission(user_id, group_id):
+    conn = connect_db()
+    cur = conn.cursor()
+
+    # Executar a consulta para verificar se usuario tem permissao para acessar o grupo
+    cur.execute('SELECT * FROM "Group" JOIN UserGroup ON "Group".id = UserGroup.group_id WHERE UserGroup.user_id = ? AND "Group".id = ?', (user_id, group_id))
+    result = cur.fetchone()
+
+    conn.close()
+
+    # Verificar se a consulta retornou alguma linha
+    if result:
+        return True  
+    else:
+        return False
+
 # Rotas
 @auth_bp.route('/')
 def index():
@@ -41,6 +58,7 @@ def login():
             # Verifique se a senha fornecida corresponde ao hash armazenado
             if bcrypt.checkpw(password.encode('utf-8'), stored_password_hash):
                 session['user'] = username
+                session['id'] = user[0]
                 return redirect(url_for('groups.home'))
             else:
                 session['login_error'] = 'Invalid username or password'

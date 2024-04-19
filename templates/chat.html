@@ -4,25 +4,64 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Chat</title>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='chat.css') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script> 
 </head>
 <body>
   <!-- Printar mensagens -->
   <ul id="messages">
-    {% for message in messages %}
-      <li>
-        <span>{{ message[1] }}</span> 
-        <span>{{ message[2].strftime('%H:%M') }}</span>
-      </li>
-    {% endfor %}
   </ul>
+
+  <script>
+    var group_id = {{ group_id }};
+    $(document).ready(function(){
+      // Buscar e exibir todas as mensagens
+      function fetchAllMessages() {
+            $.get('/fetch_messages/' + group_id, function(data) {
+                $('#messages').html(data);
+            });
+        }
+
+      // Exibir todas as mensagens ao carregar a pagina
+      fetchAllMessages();
+
+      function fetchMessages() {
+            $.get('/fetch_messages/' + group_id, function(data) {
+                $('#messages').html(data);
+            });
+        }
+
+        setInterval(fetchMessages, 5000); 
+
+        // Enviar mensagem
+        $("#form").submit(function(event) {
+            event.preventDefault();
+
+            var messageText = $("#messageText").val();
+
+            $.ajax({
+                type: 'POST',
+                url: '/send_message',
+                data: {
+                    group_id: group_id,
+                    messageText: messageText
+                },
+                success: function(response) {
+                    // Limpa o campo de texto apos o envio
+                    $("#messageText").val('');
+                    // Atualizar lista
+                    fetchMessages();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error sending message:', error);
+                }
+            });
+        });
+    });
+  </script>
+
   <!-- Formulario para enviar mensagem -->
-  <form id="form" action="/send_message" method="post">
-    <select id="group-selector" name="group_id">
-      {% for group in groups %}
-      <option value="{{ group.id }}">{{ group[0] }}</option>
-      {% endfor %}
-    </select>
-    <input type="text" id="message" name="message" autocomplete="off" />
+  <form id="form">
+    <input type="text" id="messageText" name="messageText" autocomplete="off" />
     <input type="hidden" id="group_id" name="group_id" value="{{ group_id }}">
     <button id="send-message-btn" type="submit">Send</button>
     <a href="/home">Home</a>
