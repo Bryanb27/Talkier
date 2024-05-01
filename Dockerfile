@@ -58,6 +58,9 @@ USER appuser
 
 # Copiar o código-fonte para o contêiner
 COPY app.py .
+COPY auth.py .
+COPY groups.py .
+COPY chat.py .
 COPY keys.py .
 COPY templates templates
 COPY static static

@@ -3,27 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create User</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='register.css') }}">
+    <title>Create Account</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-    <button class="return-button" onclick="logout()">Return</button>
-    <!-- Formulario para criar conta -->
-    <h1>Create new account</h1>
-    <form id="registerForm" action="/register" method="post">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username" required><br>
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" required><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password" required><br><br>
-        <button type="submit">Create account</button>
-        {% if register_stats %}
-        <p style="color: red;">{{ register_stats }}</p>
-        {% endif %}
-    </form>
-
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+          <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+              <div class="container p-5 my-5 bg-dark text-white">
+                <div class="card-body p-5 text-center">
+                  <div class="mb-md-5 mt-md-4 pb-5">
+                    <h2 class="fw-bold mb-2 text-uppercase">Chatter</h2>
+                    <p class="text-white-50 mb-5">Create your account</p>
+                    <!-- Formulario de Login -->
+                    <div data-mdb-input-init class="form-outline form-white mb-4">
+                    <form id="registerForm" action="/register" method="post">
+                      <input type="text" id="username" name="username" required class="form-control form-control-lg">
+                      <label class="form-label" for="username">Username</label>
+                    </div>
+                    <div data-mdb-input-init class="form-outline form-white mb-4">
+                      <input type="email" id="email" name="email" required class="form-control form-control-lg">
+                      <label class="form-label" for="email">Email</label>
+                    </div>
+                    <div data-mdb-input-init class="form-outline form-white mb-4">
+                      <input type="password" id="password" name="password" required class="form-control form-control-lg">
+                      <label class="form-label" for="password">Password</label>
+                    </span>
+                        <div class="valid-feedback">Good</div>
+                        <div class="invalid-feedback">Wrong</div>
+                        <div data-mdb-alert-init class="alert px-4 py-3 mb-0 d-none" role="alert" data-mdb-color="warning" id="password-alert">
+                            <ul class="list-unstyled mb-0">
+                              <li class="requirements leng">
+                                <i class="fas fa-check text-success me-2"></i>
+                                <i class="fas fa-times text-danger me-3"></i>
+                                Your password must have at least 8 chars</li>
+                              <li class="requirements big-letter">
+                                <i class="fas fa-check text-success me-2"></i>
+                                <i class="fas fa-times text-danger me-3"></i>
+                                Your password must have at least 1 big letter.</li>
+                              <li class="requirements num">
+                                <i class="fas fa-check text-success me-2"></i>
+                                <i class="fas fa-times text-danger me-3"></i>
+                                Your password must have at least 1 number.</li>
+                              <li class="requirements special-char">
+                                <i class="fas fa-check text-success me-2"></i>
+                                <i class="fas fa-times text-danger me-3"></i>
+                                Your password must have at least 1 special char.</li>
+                            </ul>                      
+                        </div>
+                    </div>
+                    <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-light btn-lg px-5" type="submit">Create</button>
+                    <p class="mb-0 me-2">Already a member?<a href="/" name="login_page" class="text-white-50 fw-bold" style="text-decoration: none;">  Sign In</a>
+                    </p>   
+                    {% if register_stats %}
+                    <p style="color: red;">{{ register_stats }}</p>
+                    {% endif %} 
+                    </div>
+                    </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            </div>
+           </div>
+        </div> 
+      </section>
     <script>
+        addEventListener("DOMContentLoaded", (event) => {
+        const password = document.getElementById("password");
+        const passwordAlert = document.getElementById("password-alert");
+        const requirements = document.querySelectorAll(".requirements");
+        const leng = document.querySelector(".leng");
+        const bigLetter = document.querySelector(".big-letter");
+        const num = document.querySelector(".num");
+        const specialChar = document.querySelector(".special-char");
+
+        requirements.forEach((element) => element.classList.add("wrong"));
+
+        password.addEventListener("focus", () => {
+            passwordAlert.classList.remove("d-none");
+            if (!password.classList.contains("is-valid")) {
+                password.classList.add("is-invalid");
+            }
+        });
+
+        password.addEventListener("input", () => {
+            const value = password.value;
+            const isLengthValid = value.length >= 8;
+            const hasUpperCase = /[A-Z]/.test(value);
+            const hasNumber = /\d/.test(value);
+            const hasSpecialChar = /[!@#$%^&*()\[\]{}\\|;:'",<.>/?`~]/.test(value);
+
+            leng.classList.toggle("good", isLengthValid);
+            leng.classList.toggle("wrong", !isLengthValid);
+            bigLetter.classList.toggle("good", hasUpperCase);
+            bigLetter.classList.toggle("wrong", !hasUpperCase);
+            num.classList.toggle("good", hasNumber);
+            num.classList.toggle("wrong", !hasNumber);
+            specialChar.classList.toggle("good", hasSpecialChar);
+            specialChar.classList.toggle("wrong", !hasSpecialChar);
+
+            const isPasswordValid = isLengthValid && hasUpperCase && hasNumber && hasSpecialChar;
+
+            if (isPasswordValid) {
+                password.classList.remove("is-invalid");
+                password.classList.add("is-valid");
+
+                requirements.forEach((element) => {
+                    element.classList.remove("wrong");
+                    element.classList.add("good");
+                });
+
+                passwordAlert.classList.remove("alert-warning");
+                passwordAlert.classList.add("alert-success");
+            } else {
+                password.classList.remove("is-valid");
+                password.classList.add("is-invalid");
+
+                passwordAlert.classList.add("alert-warning");
+                passwordAlert.classList.remove("alert-success");
+            }
+        });
+
+        password.addEventListener("blur", () => {
+            passwordAlert.classList.add("d-none");
+        });
+        });
+
         function logout() {
             // Fazer uma requisicao para o backend para realizar o logout
             fetch('/logout', { method: 'GET' })

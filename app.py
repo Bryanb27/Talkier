@@ -17,5 +17,5 @@ app.register_blueprint(chat_bp)
 
 # Funcao principal
 if __name__ == '__main__':
-    #socketio.run(app, host='0.0.0.0', port=5000)
-    socketio.run(app, debug=True, allow_unsafe_werkzeug=True, host='0.0.0.0', port=5000)
+    socketio.run(app, debug=False, allow_unsafe_werkzeug=True, host='localhost', port=5000)
+    #socketio.run(app, debug=True, allow_unsafe_werkzeug=True, host='0.0.0.0', port=5000)

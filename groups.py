@@ -45,6 +45,7 @@ def home():
 def create_group():
     if request.method == 'POST':
         new_group_name = request.form['new_group_name']
+        group_details  = request.form['group_details']
         
         # Gerar um codigo de acesso aleatorio
         join_code = generate_join_code().lower()
@@ -54,7 +55,7 @@ def create_group():
         
         try:
             # Inserir novo grupo no banco de dados com o codigo gerado
-            cur.execute('INSERT INTO "Group" (name, join_code) VALUES (?, ?)', (new_group_name, join_code))
+            cur.execute('INSERT INTO "Group" (administer, groupName, details, join_code) VALUES (?, ?, ?, ?)', (session['id'], new_group_name, group_details, join_code))
 
             # Recuperar o ID do grupo
             cur.execute('SELECT @@IDENTITY')
@@ -100,7 +101,7 @@ def join_group():
         if UserGroup:
             conn.close()
             session['join_stats'] = 'Already a member of this group!'
-            return redirect(url_for('home'))
+            return redirect(url_for('groups.home'))
         else:
             # Adicionar o usuario ao grupo
             cur.execute('INSERT INTO "UserGroup" (user_id, group_id) VALUES (?, ?)', (user[0], group[0]))

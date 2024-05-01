@@ -29,7 +29,7 @@ def user_has_permission(user_id, group_id):
         return True  
     else:
         return False
-
+    
 # Rotas
 @auth_bp.route('/')
 def index():
