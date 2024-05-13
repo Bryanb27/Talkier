@@ -49,7 +49,6 @@ def login():
         cur = conn.cursor()
         cur.execute('SELECT * FROM "User" WHERE username = ?', (username,))
         user = cur.fetchone()
-        conn.close()
 
         if user:
             # Obtenha o hash da senha do banco de dados
@@ -57,20 +56,30 @@ def login():
 
             # Verifique se a senha fornecida corresponde ao hash armazenado
             if bcrypt.checkpw(password.encode('utf-8'), stored_password_hash):
+                cur.execute('UPDATE "User" SET isActive = 1 WHERE id = ?', (user[0],))
+                conn.commit()
                 session['user'] = username
                 session['id'] = user[0]
+                conn.close()
                 return redirect(url_for('groups.home'))
             else:
                 session['login_error'] = 'Invalid username or password'
+                conn.close()
                 return redirect(url_for('auth.index'))
         else:
             session['login_error'] = 'Invalid username or password'
+            conn.close()
             return redirect(url_for('auth.index'))
         
 # Fazer Logout
 @auth_bp.route('/logout')
 def logout():
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute('UPDATE "User" SET isActive = 0 WHERE id = ?', (session['id'],))
+    conn.commit()
     session.pop('user', None)
+    conn.close()
     return redirect(url_for('auth.index'))
 
 # Cadastro de usuario

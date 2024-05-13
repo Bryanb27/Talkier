@@ -31,14 +31,21 @@ def home():
     user_id = cur.fetchone()[0]
 
     # Esvaziar a lista de grupos
+    friends = []
     groups = []
+     
+    # Recuperar os amigos/grupos de amigos associados ao usuario atual   
+    cur.execute('SELECT * FROM "Group" JOIN UserGroup ON "Group".id = UserGroup.group_id WHERE UserGroup.user_id = ? AND "Group".details = ?',
+            (user_id, 'Direct communication group'))
+    friends = cur.fetchall()
 
     # Recuperar os grupos associados ao usuario atual
-    cur.execute('SELECT * FROM "Group" JOIN UserGroup ON "Group".id = UserGroup.group_id WHERE UserGroup.user_id = ?', (user_id,))
+    cur.execute('SELECT * FROM "Group" JOIN UserGroup ON "Group".id = UserGroup.group_id WHERE UserGroup.user_id = ? AND "Group".details != ?',
+            (user_id, 'Direct communication group'))
     groups = cur.fetchall()
 
     conn.close()
-    return render_template('home.html', groups = groups, user_id = user_id, join_stats = join_stats, create_stats = create_stats, group_stats = group_stats)
+    return render_template('home.html', groups = groups, friends=friends, user_id = user_id, join_stats = join_stats, create_stats = create_stats, group_stats = group_stats)
 
 # Criar um novo grupo
 @groups_bp.route('/create_group', methods=['POST'])

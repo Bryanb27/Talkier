@@ -35,7 +35,7 @@ def fetch_messages(group_id):
     for message in messages:
         html_messages += '<li>'
         html_messages += '<span>' +message[1] +'</span>'
-        html_messages += '<span>' +message[2].strftime('%H:%M') +'</span>' 
+        html_messages += '<span style="float: right;">' +message[2].strftime('%H:%M') +'</span>' 
         html_messages += '</li>'
 
     return html_messages
@@ -55,8 +55,12 @@ def send_message():
     conn = connect_db()
     cur = conn.cursor()
 
+    # Dividir a mensagem em partes de 70 caracteres pra quebrar linha
+    message_parts = [message_content[i:i+70] for i in range(0, len(message_content), 70)]
+    formatted_message = '\n'.join(message_parts)
+
     # Inserir a mensagem no banco de dados
-    cur.execute("INSERT INTO Message (content, group_id, timestamp) VALUES (?, ?, ?)", ( message_content, group_id, timestamp))
+    cur.execute("INSERT INTO Message (content, group_id, timestamp) VALUES (?, ?, ?)", ( formatted_message, group_id, timestamp))
     conn.commit()
 
     conn.close()

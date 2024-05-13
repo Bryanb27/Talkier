@@ -60,13 +60,11 @@ USER appuser
 COPY app.py .
 COPY auth.py .
 COPY groups.py .
+COPY friends.py .
 COPY chat.py .
 COPY keys.py .
 COPY templates templates
 COPY static static
 
-# Expor a porta que o aplicativo escuta
+# Expor porta
 EXPOSE 5000
-
-# Executar o aplicativo
-CMD ["python", "app.py", "--host", "0.0.0.0"]

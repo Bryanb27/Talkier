@@ -1,16 +1,14 @@
 -- Criacao da tabela User
-CREATE TABLE [User] (
+CREATE TABLE User (
     id INT PRIMARY KEY IDENTITY,
     username NVARCHAR(100) UNIQUE NOT NULL,
     email NVARCHAR(100) UNIQUE NOT NULL,
     password_hash VARBINARY(100) NOT NULL,
     isActive BIT NOT NULL DEFAULT 0,
-    invites NVARCHAR(100)
 );
 
 -- Criacao da tabela Friendship
 CREATE TABLE Friendship (
-    friendship_id INT PRIMARY KEY IDENTITY,
     user_id1 INT,
     user_id2 INT,
     status_inv NVARCHAR(50),
@@ -21,7 +19,7 @@ CREATE TABLE Friendship (
 );
 
 -- Criacao da tabela Group
-CREATE TABLE [Group] (
+CREATE TABLE Group (
     id INT PRIMARY KEY IDENTITY,
     administer INT NOT NULL,
     groupName NVARCHAR(100) NOT NULL,

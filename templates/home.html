@@ -10,102 +10,146 @@
     <!-- CSS personalizado -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css') }}">
 </head>
-<body>
-    <section class="vh-100 gradient-custom bg-dark text-white">
+<body class="vh-100 gradient-custom bg-dark text-white"> 
+    <section>
         <div class="container py-5 h-100">
             <div class="row">
                 <div class="col">
                     <h2 class="fw-bold mb-2 text-uppercase">Chatter</h2>
-            <!-- Formulario para adicionar codigo de grupo -->
-            <form action="/join_group" method="POST">
-                <label for="group_code">Enter Group Code:</label>
-                <input type="text" id="group_code" name="group_code" required>
-                <button type="submit">Join Group</button>
-                {% if join_stats %}
-                <p style="color: red;">{{ join_stats }}</p>
-                {% endif %}
-            </form>
-        </div>
-        <div class="col">
-            <button class="logout-button" onclick="logout()">Logout</button>
-        </div>
-
-    <!-- Formulario para criar um novo grupo -->
-    <p>
-        <a class="btn btn-primary" data-bs-toggle="collapse" href=".multi-collapse" role="button" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2 multiCollapseExample3">Create new group</a>
-    </p>
-    <form action="/create_group" method="POST">
-    <div class="row">
-        <div class="col">
-          <div class="collapse multi-collapse" id="multiCollapseExample1">
-            <div class="card card-body">
-                <input type="text" id="new_group_name" name="new_group_name" placeholder="Group Name" required>
+                    <!-- Formulario para entrar em grupo -->
+                    <form action="/join_group" method="POST">
+                        <label for="group_code">Enter Group Code:</label>
+                        <input type="text" id="group_code" name="group_code" required>
+                        <button type="submit">Join Group</button>
+                        {% if join_stats %}
+                        <p style="color: red;">{{ join_stats }}</p>
+                        {% endif %}
+                    </form>
+                </div>
+                <div class="col">
+                    <button id="logout-button" onclick="logout()">Logout</button>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="collapse multi-collapse" id="multiCollapseExample2">
-            <div class="card card-body">
-                <input type="text" id="group_details" name="group_details" placeholder="Details" required>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="collapse multi-collapse" id="multiCollapseExample3">
-            <div class="card card-body">
-                <button type="submit">Create Group</button>
-            </div>
-          </div>
-        </div>
-    </div>
-    {% if create_stats %}
-        <p style="color: red;">{{ create_stats }}</p>
-    {% endif %}
-    </form>
-    <div class="row">
-        <div class="col">
-    <!-- Secao para exibir grupos existentes -->
-    <h2>Existing Groups</h2>
-    <ul>
-        <!-- Iterar sobre os grupos existentes e exibi-los -->
-        {% if groups %}
-            {% for group in groups %}
-                <li>
-                    <div class="card" style="width: 9rem;">
-                        <div class="card-body">
-                          <a href="/chat/{{ group[0] }}">
-                          <h5 class="card-title">{{ group[2] }}</h5>
-                          <p class="card-text">{{group[3]}} <br>Group code: {{group[4]}}</p>
-                          <form action="/exit_group" method="POST" style="display: inline;">
-                            <input type="hidden" name="group_id" value="{{ group[0] }}">
-                            <input type="hidden" name="user_id" value="{{ user_id }}">
-                            <button type="submit">Exit Group</button>
-                          </form>
-                          </a>
+            
+            <!-- Formulario para criar um novo grupo -->
+            <p>
+                <a class="btn btn-primary" data-bs-toggle="collapse" href=".multi-collapse" role="button" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2 multiCollapseExample3">Create new group</a>
+            </p>
+            <form action="/create_group" method="POST">
+                <div class="row">
+                    <div class="col">
+                        <div class="collapse multi-collapse" id="multiCollapseExample1">
+                            <div class="card card-body">
+                                <input type="text" id="new_group_name" name="new_group_name" placeholder="Group Name" required>
+                            </div>
                         </div>
                     </div>
-                </li>
-            {% endfor %}
-        {% else %}
-            <p>No groups available.</p>
-        {% endif %}
-        {% if group_stats %}
-        <p style="color: red;">{{ group_stats }}</p>
-        {% endif %}
-    </ul>
-        </div>
-        <div class="col">
-            <h2>Friends</h2>
-        </div>
-    </div>
+                    <div class="col">
+                        <div class="collapse multi-collapse" id="multiCollapseExample2">
+                            <div class="card card-body">
+                                <input type="text" id="group_details" name="group_details" placeholder="Details" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="collapse multi-collapse" id="multiCollapseExample3">
+                            <div class="card card-body">
+                                <button type="submit">Create Group</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if create_stats %}
+                <p style="color: red;">{{ create_stats }}</p>
+                {% endif %}
+            </form>
 
-
-
-
+            <div>
+                <h2>Search For Friends</h2>
+                <form id="searchForm">
+                    <label for="searchInput">Search:</label>
+                    <input type="text" id="searchInput" name="query">
+                    <button type="submit">Search</button>
+                <ul id="userList"></ul>
+                </form>
+            </div>
+            
+            <!-- Convites pendentes -->
+            <div id="pending-invitations">
+            </div>
+            
+            <div class="row">
+                <div class="col">
+                    <!-- Secao para exibir grupos existentes -->
+                    <h2>Existing Groups</h2>
+                    <ul>
+                        <!-- Iterar sobre os grupos existentes e exibi-los -->
+                        {% if groups %}
+                            {% for group in groups %}
+                                <li>
+                                    <div class="card" style="width: 9rem;">
+                                        <div class="card-body">
+                                            <a href="/chat/{{ group[0] }}">
+                                                <h5 class="card-title">{{ group[2] }}</h5>
+                                                <p class="card-text">{{group[3]}} <br>Group code: {{group[4]}}</p>
+                                                <form action="/exit_group" method="POST" style="display: inline;">
+                                                    <input type="hidden" name="group_id" value="{{ group[0] }}">
+                                                    <input type="hidden" name="user_id" value="{{ user_id }}">
+                                                    <button type="submit">Exit Group</button>
+                                                </form>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <p>No groups available.</p>
+                        {% endif %}
+                        {% if group_stats %}
+                        <p style="color: red;">{{ group_stats }}</p>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="col">
+                    <h2>Friends</h2>
+                    <ul>
+                        <!-- Iterar sobre os amigos existentes e exibi-los -->
+                        {% if friends %}
+                            {% for friend in friends %}
+                                <li>
+                                    <div class="card" style="width: 9rem;">
+                                        <div class="card-body">
+                                            <a href="/chat/{{ friend[0] }}">
+                                                <h5 class="card-title">{{ friend[2] }}</h5>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                            {% endif %}
+                    </ul>
+                    <ul id="friendsList"></ul>
+                </div>
+            </div>
         </div>
     </section>
     
     <script>
+    // Resolver problemma de apresentacao bootstrap
+    src="/docs/5.0/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+    crossorigin="anonymous"
+
+    const logoutButton = document.getElementById('logout-button');
+    
+    logoutButton.addEventListener('click', function(event) {
+    event.preventDefault();
+    const confirmationMessage = 'Are you sure you want to exit?';
+    if (confirm(confirmationMessage)) {
+        logout();
+    }
+    });
+
         function logout() {
             // Fazer uma requisicao para o backend para realizar o logout
             fetch('/logout', { method: 'GET' })
@@ -118,7 +162,148 @@
                 console.error('Erro ao fazer logout:', error);
             });
         }
+
+        function viewUsers(event) {
+            event.preventDefault();
+            const inputField = document.getElementById('searchInput');
+            const userList = document.getElementById('userList');
+            const searchText = inputField.value.trim();
+
+            // Enviar solicitacao para o backend Flask para obter usuarios de acordo com pesquisa
+            fetch(`/search-users?query=${searchText}`)
+            .then(response => response.json())
+            .then(data => {
+                // Limpe a lista de usuarios
+                userList.innerHTML = '';
+
+                if (data.length === 0) {
+                    const notFoundMessage = document.createElement('li');
+                    notFoundMessage.textContent = 'User not found!!';
+                    userList.appendChild(notFoundMessage);
+                } else {
+                    // Adicione os usuarios correspondentes a lista
+                    data.forEach(user => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = user.name;
+
+                        // Adicionar um botao de enviar convite
+                        const sendRequestButton = document.createElement('button');
+                        sendRequestButton.textContent = 'Send Invite';
+                        sendRequestButton.addEventListener('click', function() {
+                            sendFriendRequest(user.id);
+                        });
+                        listItem.appendChild(sendRequestButton);
+
+                        userList.appendChild(listItem);
+                    });
+                }
+            })
+                .catch(error => console.error('Error while searching user:', error));
+        }
+
+        function sendFriendRequest(userId) {
+            // Enviar solicitacao
+            fetch('/send_friend_request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id2: userId })
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(error => console.error('Error sending invite:', error));
+        }
+
+        const searchForm = document.getElementById('searchForm');
+        searchForm.addEventListener('submit', viewUsers);
+
+        // Funcao para responder aos convites de amizade
+        function respondToFriendRequest(userId1, userId2, response) {
+            fetch('/respond_friend_request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id1: userId1, user_id2: userId2, response: response })
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(error => console.error('Error while answering invite:', error));
+        }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadPendingInvitations();
+        loadFriendsList();
+
+        function loadPendingInvitations() {
+            fetch('/pending_invitations')
+                .then(response => response.json())
+                .then(data => {
+                    const pendingInvitationsContainer = document.getElementById('pending-invitations');
+
+                    // Limpa o conteudo atual do container
+                    pendingInvitationsContainer.innerHTML = '';
+
+                    // Adiciona os convites pendentes ao container
+                    if (data.invitations.length > 0) {
+                        data.invitations.forEach(invite => {
+                            const p = document.createElement('p');
+                            p.textContent = `${invite.username} send you a friendship invite!`;
+
+                            // Adiciona botoes de aceitar e recusar
+                            const acceptButton = document.createElement('button');
+                            acceptButton.textContent = 'Accept';
+                            acceptButton.addEventListener('click', function() {
+                                respondToFriendRequest(invite.user_id1, invite.user_id2, 'accepted');
+                            });
+
+                            const rejectButton = document.createElement('button');
+                            rejectButton.textContent = 'Reject';
+                            rejectButton.addEventListener('click', function() {
+                                respondToFriendRequest(invite.user_id1, invite.user_id2, 'rejected');
+                            });
+
+                            p.appendChild(acceptButton);
+                            p.appendChild(rejectButton);
+
+                            pendingInvitationsContainer.appendChild(p);
+                        });
+                    } else {
+                        const p = document.createElement('p');
+                        p.textContent = 'No invites at the moment.';
+                        pendingInvitationsContainer.appendChild(p);
+                    }
+                })
+                .catch(error => console.error('Error loading pending invites:', error));
+        }
+
+        function loadFriendsList() {
+            fetch('/friends_list')
+                .then(response => response.json())
+                .then(data => {
+                    const friendsListContainer = document.getElementById('friendsList');
+
+                    // Limpa a lista atual
+                    friendsListContainer.innerHTML = '';
+
+                    // Atualiza a lista
+                    data.friends.forEach(friend => {
+                        const li = document.createElement('li');
+                        const status = friend.isActive ? 'Online' : 'Offline';
+                        li.textContent = `${friend.username} (${status})`;
+                        friendsListContainer.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error loading friends list:', error));
+        }   
+    });
     </script>
-    </div>
 </body>
 </html>
