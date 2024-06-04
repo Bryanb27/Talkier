@@ -16,22 +16,29 @@
               <div class="container p-5 my-5 bg-dark text-white">
                 <div class="card-body p-5 text-center">
                   <div class="mb-md-5 mt-md-4 pb-5">
-                    <h2 class="fw-bold mb-2 text-uppercase">Chatter</h2>
+                    <h2 class="fw-bold mb-2 text-uppercase">Talkie</h2>
                     <p class="text-white-50 mb-5">Create your account</p>
                     <!-- Formulario de Login -->
                     <div data-mdb-input-init class="form-outline form-white mb-4">
-                    <form id="registerForm" action="/register" method="post">
-                      <input type="text" id="username" name="username" required class="form-control form-control-lg">
+                    <form id="registerForm" action="/register" method="post" onsubmit="return validateForm()">
+                      <input type="text" id="username" name="username" required maxlength="20" class="form-control form-control-lg">
                       <label class="form-label" for="username">Username</label>
                     </div>
                     <div data-mdb-input-init class="form-outline form-white mb-4">
-                      <input type="email" id="email" name="email" required class="form-control form-control-lg">
+                      <input type="email" id="email" name="email" required maxlength="35" class="form-control form-control-lg">
                       <label class="form-label" for="email">Email</label>
                     </div>
                     <div data-mdb-input-init class="form-outline form-white mb-4">
                       <input type="password" id="password" name="password" required class="form-control form-control-lg">
                       <label class="form-label" for="password">Password</label>
-                    </span>
+                    </div>
+                    <div data-mdb-input-init class="form-outline form-white mb-4">
+                      <input type="password" id="confirm" name="confirm" required class="form-control form-control-lg">
+                      <label class="form-label" for="password">Confirm Password</label>
+                    </div>
+                    <div id="passwordMatchAlert" class="alert alert-danger d-none" role="alert">
+                      Passwords do not match!
+                    </div>
                         <div class="valid-feedback">Good</div>
                         <div class="invalid-feedback">Wrong</div>
                         <div data-mdb-alert-init class="alert px-4 py-3 mb-0 d-none" role="alert" data-mdb-color="warning" id="password-alert">
@@ -138,18 +145,19 @@
         });
         });
 
-        function logout() {
-            // Fazer uma requisicao para o backend para realizar o logout
-            fetch('/logout', { method: 'GET' })
-            .then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao fazer logout:', error);
-            });
+        function validateForm() {
+        var password = document.getElementById("password").value;
+        var confirm = document.getElementById("confirm").value;
+        var passwordMatchAlert = document.getElementById("passwordMatchAlert");
+
+        if (password !== confirm) {
+            passwordMatchAlert.classList.remove("d-none");
+            return false; 
+        } else {
+            passwordMatchAlert.classList.add("d-none");
+            return true; 
         }
+    }
     </script>
 </body>
 </html>

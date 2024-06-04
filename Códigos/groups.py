@@ -16,7 +16,7 @@ def generate_join_code(length=8):
 def home():
     # Redirecionar se o usuario nao estiver logado
     if 'user' not in session:
-        return redirect('auth.login')
+       return redirect('auth.login')
     
     # Renderizar status do groups_bp
     join_stats = session.pop('join_stats', None)
@@ -25,25 +25,41 @@ def home():
 
     conn = connect_db()
     cur = conn.cursor()
+    
+    #Setar para offline no menu
+    cur.execute('UPDATE [User] SET isActive = ? WHERE username = ?', (False, session['user']))
 
     # Recuperar o ID do usuario atual
     cur.execute('SELECT id FROM "User" WHERE username = ?', (session['user'],))
     user_id = cur.fetchone()[0]
+    
 
     # Esvaziar a lista de grupos
     friends = []
     groups = []
-     
+
     # Recuperar os amigos/grupos de amigos associados ao usuario atual   
-    cur.execute('SELECT * FROM "Group" JOIN UserGroup ON "Group".id = UserGroup.group_id WHERE UserGroup.user_id = ? AND "Group".details = ?',
-            (user_id, 'Direct communication group'))
+    cur.execute('''SELECT [User].isActive, "Group".id, "Group".groupName
+                FROM "Group" 
+                JOIN UserGroup ON "Group".id = UserGroup.group_id 
+                JOIN [User] ON UserGroup.user_id = [User].id
+                WHERE UserGroup.user_id = ? 
+                AND "Group".details = ?''',
+                (user_id, 'Direct communication group'))
     friends = cur.fetchall()
+    
+    # Corrigir print do nome do grupo
+    for friend in friends:
+        friend[2] = friend[2].replace(session['user'], '')
+        friend[2] = friend[2].replace("_", '')
+        
 
     # Recuperar os grupos associados ao usuario atual
-    cur.execute('SELECT * FROM "Group" JOIN UserGroup ON "Group".id = UserGroup.group_id WHERE UserGroup.user_id = ? AND "Group".details != ?',
-            (user_id, 'Direct communication group'))
+    cur.execute('SELECT * FROM "Group" WHERE "Group".details != ?',
+            ('Direct communication group'))
     groups = cur.fetchall()
 
+    conn.commit()
     conn.close()
     return render_template('home.html', groups = groups, friends=friends, user_id = user_id, join_stats = join_stats, create_stats = create_stats, group_stats = group_stats)
 
@@ -53,6 +69,7 @@ def create_group():
     if request.method == 'POST':
         new_group_name = request.form['new_group_name']
         group_details  = request.form['group_details']
+        people_limit = request.form['how_many_people']
         
         # Gerar um codigo de acesso aleatorio
         join_code = generate_join_code().lower()
@@ -62,7 +79,7 @@ def create_group():
         
         try:
             # Inserir novo grupo no banco de dados com o codigo gerado
-            cur.execute('INSERT INTO "Group" (administer, groupName, details, join_code) VALUES (?, ?, ?, ?)', (session['id'], new_group_name, group_details, join_code))
+            cur.execute('INSERT INTO "Group" (administer, groupName, details, join_code, p_limit) VALUES (?, ?, ?, ?, ?)', (session['id'], new_group_name, group_details, join_code, people_limit))
 
             # Recuperar o ID do grupo
             cur.execute('SELECT @@IDENTITY')
@@ -84,7 +101,7 @@ def create_group():
             session['create_stats'] = f'Error creating group: {str(e)}'
             return redirect(url_for('groups.home'))
         
-# Entrar em um grupo
+# Entrar em um chat pelo codigo
 @groups_bp.route('/join_group', methods=['POST'])
 def join_group():
     group_code = request.form['group_code'].lower()
@@ -97,34 +114,17 @@ def join_group():
     group = cur.fetchone()
 
     if group:
-        username = session['user']
-        cur.execute('SELECT * FROM "User" WHERE username = ?', (username,))
-        user = cur.fetchone()
-        
-        cur.execute('SELECT * FROM "UserGroup" WHERE user_id = ? AND group_id = ?', (user[0], group[0]))
-        UserGroup = cur.fetchone()
-
-        # Verificar se o usuario ja pertence ao grupo
-        if UserGroup:
-            conn.close()
-            session['join_stats'] = 'Already a member of this group!'
-            return redirect(url_for('groups.home'))
-        else:
-            # Adicionar o usuario ao grupo
-            cur.execute('INSERT INTO "UserGroup" (user_id, group_id) VALUES (?, ?)', (user[0], group[0]))
-            conn.commit()
-            conn.close()
-            session['join_stats'] = 'Successfully joined the group!'
-            return redirect(url_for('groups.home')) 
+        conn.close()
+        return redirect(url_for('chat.chat', group_id=group[0]))
     else:
         # Se o grupo com o codigo fornecido nao existir, redirecione de volta para a pagina inicial
         conn.close()
         session['join_stats'] = 'Group not found!'
         return redirect(url_for('groups.home')) 
 
-# Sair de um grupo 
-@groups_bp.route('/exit_group', methods=['POST'])
-def exit_group():
+# Deletar um grupo 
+@groups_bp.route('/delete_group', methods=['POST'])
+def delete_group():
     if request.method == 'POST':
         group_id = request.form['group_id']
         user_id = request.form['user_id']
@@ -133,8 +133,10 @@ def exit_group():
             conn = connect_db()
             cur = conn.cursor()
 
-            # Deletar o usuario
+            # Deletar o grupo por completo
+            cur.execute('DELETE FROM Message WHERE group_id = ?', (group_id,))
             cur.execute('DELETE FROM UserGroup WHERE group_id = ? AND user_id = ?', (group_id, user_id))
+            cur.execute('DELETE FROM "Group" WHERE id = ?', (group_id))
             conn.commit()
             conn.close()
 

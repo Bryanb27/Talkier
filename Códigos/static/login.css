@@ -41,7 +41,7 @@
   .home-textarea {
     width: 135px;
   }
-  @media(max-width: 479px) {
+  @media(max-width: 720px) {
     .home-container1 {
       justify-content: space-between;
     }

@@ -5,7 +5,7 @@ import datetime
 
 friends_bp = Blueprint('friends', __name__)
 
-#Pesquisar por usuario
+# Pesquisar por usuario
 @friends_bp.route('/search-users')
 def search_users():
     query = request.args.get('query', '').lower()
@@ -25,7 +25,7 @@ def search_users():
     
     return jsonify(users_list)
 
-#Enviar convites
+# Enviar convites
 @friends_bp.route('/send_friend_request', methods=['POST'])
 def send_friend_request():
     user_id1 = session['id']  # ID do user que envia o convite
@@ -71,7 +71,7 @@ def pending_invitations():
     
     return jsonify({'invitations': invitations_list})
 
-
+# Responder ao request
 @friends_bp.route('/respond_friend_request', methods=['POST'])
 def respond_friend_request():
     user_id1 = request.json['user_id1']  # ID do usuario que enviou o convite
@@ -113,7 +113,7 @@ def create_group_for_friends(user_id1, user_id2, conn):
 
     join_code = generate_join_code().lower()
 
-    cur.execute('INSERT INTO "Group" (administer, groupName, details, join_code) VALUES (?, ?, ?, ?)', (user_id1, group_name, group_details, join_code))
+    cur.execute('INSERT INTO "Group" (administer, groupName, details, join_code, p_limit) VALUES (?, ?, ?, ?, ?)', (user_id1, group_name, group_details, join_code, 2))
 
     cur.execute('SELECT @@IDENTITY')
     group_id = cur.fetchone()[0]
@@ -124,7 +124,7 @@ def create_group_for_friends(user_id1, user_id2, conn):
 
     conn.commit()
 
-#Printar lista de amigos
+# Printar lista de amigos
 @friends_bp.route('/friends_list')
 def friends_list():
     user_id = session['id']
@@ -134,11 +134,11 @@ def friends_list():
 
     # Seleciona todos os amigos do usuario atual
     cur.execute('''
-        SELECT u.username, u.isActive
-        FROM Friendship f
-        JOIN "User" u ON f.user_id1 = u.id OR f.user_id2 = u.id
-        WHERE (f.user_id1 = ? OR f.user_id2 = ?) AND f.status_inv = 'accepted'
-    ''', (user_id, user_id))
+    SELECT u.username, u.isActive
+    FROM Friendship f
+    JOIN "User" u ON (f.user_id1 = u.id OR f.user_id2 = u.id) AND u.id != ?
+    WHERE (f.user_id1 = ? OR f.user_id2 = ?) AND f.status_inv = 'accepted'
+    ''', (user_id, user_id, user_id))
     friends = cur.fetchall()
 
     conn.close()

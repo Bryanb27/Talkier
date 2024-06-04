@@ -1,17 +1,17 @@
 -- Criacao da tabela User
-CREATE TABLE User (
+CREATE TABLE [User] (
     id INT PRIMARY KEY IDENTITY,
-    username NVARCHAR(100) UNIQUE NOT NULL,
-    email NVARCHAR(100) UNIQUE NOT NULL,
+    username NVARCHAR(21) UNIQUE NOT NULL,
+    email NVARCHAR(40) UNIQUE NOT NULL,
     password_hash VARBINARY(100) NOT NULL,
-    isActive BIT NOT NULL DEFAULT 0,
+    isActive BIT NOT NULL DEFAULT 0
 );
 
 -- Criacao da tabela Friendship
 CREATE TABLE Friendship (
     user_id1 INT,
     user_id2 INT,
-    status_inv NVARCHAR(50),
+    status_inv NVARCHAR(10),
     created_at DATETIME,
     PRIMARY KEY (user_id1, user_id2),
     FOREIGN KEY (user_id1) REFERENCES [User](id),
@@ -19,21 +19,27 @@ CREATE TABLE Friendship (
 );
 
 -- Criacao da tabela Group
-CREATE TABLE Group (
+CREATE TABLE [Group] (
     id INT PRIMARY KEY IDENTITY,
     administer INT NOT NULL,
-    groupName NVARCHAR(100) NOT NULL,
-    details NVARCHAR(100) NOT NULL,
-    join_code NVARCHAR(100) NOT NULL
+    groupName NVARCHAR(50) NOT NULL,
+    details NVARCHAR(30) NOT NULL,
+    join_code NVARCHAR(10) NOT NULL,
+    p_limit INT NOT NULL,
+    active_users INT DEFAULT 0
 );
 
 -- Criacao da tabela Message
 CREATE TABLE Message (
     id INT PRIMARY KEY IDENTITY,
-    content NVARCHAR(255) NOT NULL,
+    content NVARCHAR(110) NOT NULL,
     [timestamp] DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     group_id INT NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES [Group](id)
+    sender_id INT NOT NULL,
+    sender_name NVARCHAR(21) NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES [Group](id),
+    FOREIGN KEY (sender_id) REFERENCES [User](id),
+    FOREIGN KEY (sender_name) REFERENCES [User](username)
 );
 
 -- Criacao da tabela UserGroup

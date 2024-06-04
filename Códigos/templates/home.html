@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="vh-100 gradient-custom bg-dark text-white"> 
+    <section>
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card-body p-5 text-center">
+                <header>
+                    <h2 class="fw-bold mb-2 text-uppercase text-center vertical-center">Talkie</h2>
+                </header>
+
+            <div class="container" style="margin-top: 10px;">
+                <div class="row">
+                  <div class="col">
+                    <!-- icone de criar grupo -->
+                    <div class="rounded-icon" id="createIcon" style="cursor: pointer;">
+                      <i class="bi bi-plus"></i>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <!-- icon para entrar em um grupo -->
+                    <div class="rounded-icon" id="joinIcon" style="cursor: pointer;"> 
+                        <i class="bi bi-box-arrow-in-right"></i>
+                    </div>
+                </div>                
+                  <div class="col">
+                    <!-- icon de procurar amigo -->
+                    <div class="rounded-icon" id="searchIcon" style="cursor: pointer;">
+                      <i class="bi bi-person-plus"></i>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <!-- icon de amigos -->
+                    <div class="rounded-icon" id="displayIcon" style="cursor: pointer;">
+                      <i class="bi bi-people"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              
+            <div id="createForm" style="display: none; margin-top: 10px;">
+            <h2>Create a Group</h2>
+            <!-- Formulario para criar um novo grupo -->
+            <form action="/create_group" method="POST">
+                <label for="new_group_name">Group Name:</label>
+                <input type="text" id="new_group_name" name="new_group_name" placeholder="Enter Group Name" required>
+                
+                <label for="group_details">Details:</label>
+                <input type="text" id="group_details" name="group_details" placeholder="Enter Group Details" required>
+                
+                <label for="how_many_people">How many people:</label>
+                <select id="how_many_people" name="how_many_people" class="form-select" aria-label="Default select example">
+                    <option value="4">4</option>
+                    <option value="8">8</option>
+                    <option value="16">16</option>
+                    <option value="32">32</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Create Group</button>
+                
+                {% if create_stats %}
+                <p style="color: red;">{{ create_stats }}</p>
+                {% endif %}
+            </form>
+            </div>
+
+            <div id="joinForm" style="display: none; margin-top: 10px;">
+                <h2>Join a Group</h2>
+                <div class="row">
+                    <div class="col">
+                        <!-- Formulario para entrar em grupo -->
+                        <form action="/join_group" method="POST">
+                            <label for="group_code">Enter Group Code:</label>
+                            <input type="text" id="group_code" name="group_code" required>
+                            <button type="submit">Join Group</button>
+                            {% if join_stats %}
+                            <p style="color: red;">{{ join_stats }}</p>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="searchFriend" style="display: none;">
+            <div style="margin-top: 10px;">
+                <h2>Search For Friends</h2>
+                <form id="searchForm">
+                    <label for="searchInput">Search:</label>
+                    <input type="text" id="searchInput" name="query">
+                    <button type="submit">Search</button>
+                <ul id="userList"></ul>
+                </form>
+            </div>
+            </div>
+
+            <div id="displayFriend" style="display: none; margin-top: 10px;">
+                <h2>Friends</h2>
+                <div class="row">
+                    <ul>
+                        <!-- Iterar sobre os amigos existentes e exibi-los -->
+                        {% if friends %}
+                            {% for friend in friends %}
+                                <li>
+                                    <div class="card" >
+                                        <div class="card-body">
+                                            <a href="/chat/{{ friend[1] }}">
+                                                <!-- depuracao friend[0] -->
+                                                {% if friend[0] %}
+                                                <h5 class="card-title" style="color: green;">{{ friend[2] }}</h5>
+                                                {% else %}
+                                                <h5 class="card-title" style="color: red;">{{ friend[2] }}</h5>
+                                                {% endif %}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                            {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Convites pendentes -->
+            <div id="pending-invitations" style="margin-top: 10px;">
+            </div>
+            
+            <div class="row">
+                <!-- Secao para exibir grupos existentes -->
+                <div class="col">
+                    <h2>Groups</h2>
+                    <!-- Iterar sobre os grupos existentes e exibi-los -->
+                    {% if groups %}
+                        {% for group in groups %}
+                            <div class="row mb-3" id="groups">
+                                <div class="col">
+                                    <div class="border p-3">
+                                        <a href="/chat/{{ group[0] }}">
+                                            <h5>{{ group[2] }}</h5>
+                                            <p>{{ group[3] }}</p>
+                                        </a>
+                                        <!-- Barra para mostrar quantas pessoas tem na sala -->
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ group[6] / group[5] * 100 }}%; display: flex; justify-content: center; align-items: center;" aria-valuenow="{{ group[6] }}" aria-valuemin="0" aria-valuemax="{{ group[5] }}">
+                                            <div style="color: black;">
+                                                <span>{{ group[6] }} / {{ group[5] }}</span>
+                                            </div>  
+                                        </div>  
+                                        </div>
+                                        <!-- So podera excluir o grupo o administrador do mesmo -->
+                                        {% if user_id == group[1] %}
+                                        <form action="/delete_group" method="POST">
+                                            <input type="hidden" name="group_id" value="{{ group[0] }}">
+                                            <input type="hidden" name="user_id" value="{{ user_id }}">
+                                            <button type="submit" class="btn btn-danger" style="margin-top: 10px;">Delete Group</button>
+                                        </form>
+                                        {% endif %}
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="row">
+                            <div class="col">
+                                <p>No groups available.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if group_stats %}
+                    <p style="color: red;">{{ group_stats }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+        </div>
+    </section>
+    
+    <script>
+    // Resolver problemma de apresentacao bootstrap
+    src="/docs/5.0/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+    crossorigin="anonymous"
+
+    $(document).ready(function(){
+        $("#createIcon").click(function(){
+            $("#createForm").toggle();
+            $("#joinForm, #displayFriend, #searchFriend").hide();
+        });
+    });
+
+    $(document).ready(function(){
+        $("#joinIcon").click(function(){
+            $("#joinForm").toggle();
+            $("#createForm, #displayFriend, #searchFriend").hide();
+        });
+    });
+
+    $(document).ready(function(){
+        $("#displayIcon").click(function(){
+            $("#displayFriend").toggle();
+            $("#createForm, #joinForm, #searchFriend").hide();
+        });
+    });
+
+    $(document).ready(function(){
+        $("#searchIcon").click(function(){
+            $("#searchFriend").toggle();
+            $("#createForm, #joinForm, #displayFriend").hide();
+        });
+    });
+
+    $(document).ready(function() {
+    // Atualizar home
+    function updateHomePage() {
+        $.ajax({
+            url: '/home', 
+            type: 'GET',
+            success: function(response) {
+                $('#homeContent').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Erro ao atualizar a página home:', error);
+            }
+        });
+    }
+
+    // A cada 10 segundos
+    setInterval(updateHomePage, 10000);
+    });
+
+        // Pesquisar por usuario de forma dinamica
+        function viewUsers(event) {
+            event.preventDefault();
+            const inputField = document.getElementById('searchInput');
+            const userList = document.getElementById('userList');
+            const searchText = inputField.value.trim();
+
+            fetch(`/search-users?query=${searchText}`)
+            .then(response => response.json())
+            .then(data => {
+                // Limpe a lista de usuarios
+                userList.innerHTML = '';
+
+                if (data.length === 0) {
+                    const notFoundMessage = document.createElement('li');
+                    notFoundMessage.textContent = 'User not found!!';
+                    userList.appendChild(notFoundMessage);
+                } else {
+                    // Adicione os usuarios correspondentes a lista
+                    data.forEach(user => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = user.name;
+
+                        // Adicionar um botao de enviar convite
+                        const sendRequestButton = document.createElement('button');
+                        sendRequestButton.textContent = 'Send Invite';
+                        sendRequestButton.classList.add('btn', 'btn-primary');
+                        sendRequestButton.addEventListener('click', function() {
+                            sendFriendRequest(user.id);
+                        });
+                        listItem.appendChild(sendRequestButton);
+
+                        userList.appendChild(listItem);
+                    });
+                }
+            })
+                .catch(error => console.error('Error while searching user:', error));
+        }
+
+        // Enviar solicitacao
+        function sendFriendRequest(userId) {
+            fetch('/send_friend_request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id2: userId })
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(error => console.error('Error sending invite:', error));
+        }
+
+        const searchForm = document.getElementById('searchForm');
+        searchForm.addEventListener('submit', viewUsers);
+
+        // Funcao para responder aos convites de amizade
+        function respondToFriendRequest(userId1, userId2, response) {
+            fetch('/respond_friend_request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id1: userId1, user_id2: userId2, response: response })
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(error => console.error('Error while answering invite:', error));
+        }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadPendingInvitations();
+        loadFriendsList();
+
+        // Funcao para carregar convites 
+        function loadPendingInvitations() {
+            fetch('/pending_invitations')
+                .then(response => response.json())
+                .then(data => {
+                    const pendingInvitationsContainer = document.getElementById('pending-invitations');
+
+                    // Limpa o conteudo atual do container
+                    pendingInvitationsContainer.innerHTML = '';
+
+                    // Adiciona os convites pendentes ao container
+                    if (data.invitations.length > 0) {
+                        data.invitations.forEach(invite => {
+                            const p = document.createElement('p');
+                            p.textContent = `${invite.username} send you a friendship invite!`;
+
+                            // Adiciona botoes de aceitar e recusar
+                            const acceptButton = document.createElement('button');
+                            acceptButton.textContent = 'Accept';
+                            acceptButton.classList.add('btn', 'btn-primary');
+                            acceptButton.addEventListener('click', function() {
+                                respondToFriendRequest(invite.user_id1, invite.user_id2, 'accepted');
+                            });
+
+                            const rejectButton = document.createElement('button');
+                            rejectButton.textContent = 'Reject';
+                            rejectButton.classList.add('btn', 'btn-primary');
+                            rejectButton.addEventListener('click', function() {
+                                respondToFriendRequest(invite.user_id1, invite.user_id2, 'rejected');
+                            });
+
+                            p.appendChild(acceptButton);
+                            p.appendChild(rejectButton);
+
+                            pendingInvitationsContainer.appendChild(p);
+                        });
+                    } else {
+                        const p = document.createElement('p');
+                        p.textContent = 'No invites at the moment.';
+                        pendingInvitationsContainer.appendChild(p);
+                    }
+                })
+                .catch(error => console.error('Error loading pending invites:', error));
+        }
+
+        //Funcao para carregar lista de amigos
+        function loadFriendsList() {
+            fetch('/friends_list')
+                .then(response => response.json())
+                .then(data => {
+                    const friendsListContainer = document.getElementById('friendsList');
+
+                    // Limpa a lista atual
+                    friendsListContainer.innerHTML = '';
+
+                    // Atualiza a lista
+                    data.friends.forEach(friend => {
+                        const li = document.createElement('li');
+                        const status = friend.isActive ? 'Online' : 'Offline';
+                        li.textContent = `${friend.username} (${status})`;
+                        friendsListContainer.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error loading friends list:', error));
+        }   
+    });
+    </script>
+</body>
+</html>
