@@ -26,7 +26,7 @@ def chat(group_id):
         cur.execute('UPDATE [User] SET isActive = ? WHERE username = ?', (True, session['user']))
         conn.commit()
         conn.close()
-        return render_template('chat.html', group_id=group_id)
+        return render_template('chat.html', group_id=group_id, group_code=group_traits[4], group_name=group_traits[2], group_details=group_traits[3])
     else:
         return redirect(url_for('groups.home'))
         

@@ -13,7 +13,7 @@
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-      <div></div>
+        <div style="text-align: center;"><h1>{{ group_name }}</h1></div>
               <!-- As mensagens -->
               <ul id="messages">
               </ul>
@@ -25,6 +25,9 @@
                 <button id="homeButton">Home</button>
               </form>
             </div>
+            {% if group_details != 'Direct communication group' %}
+                <div style="text-align: center;"><h2>Código do grupo: {{ group_code }}</h2></div>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -40,10 +43,16 @@
     $(document).ready(function(){
     var group_id = "{{ group_id }}";
 
+    function scrollToBottom() {
+    var messages = document.getElementById('messages');
+    messages.scrollTop = messages.scrollHeight;
+    }
+
     // Buscar e exibir todas as mensagens
     function fetchAllMessages() {
         $.get('/fetch_messages/' + group_id, function(data) {
             $('#messages').html(data);
+            scrollToBottom();
         });
     }
 
@@ -53,6 +62,13 @@
     function fetchMessages() {
         $.get('/fetch_messages/' + group_id, function(data) {
             $('#messages').html(data);
+        });
+    }
+
+    function fetchMessages_silvertape() {
+        $.get('/fetch_messages/' + group_id, function(data) {
+            $('#messages').html(data);
+            scrollToBottom();
         });
     }
 
@@ -77,7 +93,8 @@
                   // Limpa o campo de texto 
                   $("#messageText").val('');
                   // Atualizar lista
-                  fetchMessages();
+                  fetchMessages_silvertape();
+                  scrollToBottom();
               },
               error: function(xhr, status, error) {
                   console.error('Error sending message:', error);
@@ -85,6 +102,23 @@
           });
       });
   });
+
+  // Corrigir pra quando usuario fechar aba
+  $(window).on('beforeunload', function() {
+        var group_id = "{{ group_id }}";
+        $.ajax({
+            url: '/remove_user_from_active_list/' + group_id,
+            type: 'POST',
+            // Consertar erro por conta de sincronia
+            async: true,
+            success: function(data) {
+                console.log('Usuário removido da lista de usuários ativos.');
+            },
+            error: function(xhr, status, error) {
+                console.error('Erro ao remover usuário da lista de usuários ativos:', error);
+            }
+        });
+    });
 
   // Solicitar remocao do active users
   $(document).ready(function() {

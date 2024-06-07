@@ -37,6 +37,7 @@ def home():
     # Esvaziar a lista de grupos
     friends = []
     groups = []
+    isactive_silvertape = []
 
     # Recuperar os amigos/grupos de amigos associados ao usuario atual   
     cur.execute('''SELECT [User].isActive, "Group".id, "Group".groupName
@@ -47,12 +48,12 @@ def home():
                 AND "Group".details = ?''',
                 (user_id, 'Direct communication group'))
     friends = cur.fetchall()
-    
+
     # Corrigir print do nome do grupo
     for friend in friends:
         friend[2] = friend[2].replace(session['user'], '')
         friend[2] = friend[2].replace("_", '')
-        
+
 
     # Recuperar os grupos associados ao usuario atual
     cur.execute('SELECT * FROM "Group" WHERE "Group".details != ?',
