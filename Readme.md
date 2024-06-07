@@ -46,5 +46,19 @@ Além das plataformas e tecnologias mencionadas anteriormente, o desenvolvimento
 
 ## Estrutura do Repositório
 1. `Código/`: Contém o código-fonte do projeto.
-2. `Como Executar/`: Contém as instruções passo a passo de como rodar a aplicação em localhost
-3. `Documentação/`: Contém o artigo desenvolvido, junto com a apresentação do TCC.
+2. `Documentação/`: Contém o artigo desenvolvido, junto com a apresentação do TCC.
+
+
+## Pré-requisitos para a Execução
+1. **Instalar Python**
+2. **Configurar a Conexão e a Chave da API**
+   - Crie um arquivo Python chamado `keys.py` com as configurações de conexão ao banco de dados e com a chave da API Kickbox.
+
+## Como Executar Localmente
+1. Após fazer o download e extrair a aplicação, abra o terminal (cmd) na pasta extraída e execute:
+   ```sh
+   pip install -r requirements.txt 
+2. Em seguida, execute o commando:
+   ```sh
+   py app.py
+3. No navegador, abra a URL http://127.0.0.1:5000 para acessar a aplicação.
