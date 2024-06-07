@@ -1,7 +1,7 @@
 # Explorando Tecnologias de Computação em Nuvem no Desenvolvimento de uma Aplicação de Chat Web
 
 ## Descrição
-Este repositório contém o código-fonte, como executar e a documentação associada ao meu Trabalho de Conclusão de Curso (TCC) sobre computação em nuvem, explorando o uso do Docker e ferramentas da Microsoft Azure. O TCC investiga como as tecnologias de contêineres e a infraestrutura em nuvem podem ser combinadas para fornecer soluções escaláveis e eficientes.
+Este repositório contém o código-fonte e a documentação associada ao meu Trabalho de Conclusão de Curso (TCC) sobre computação em nuvem, explorando o uso do Docker e ferramentas da Microsoft Azure. O TCC explora as tecnologias de contêineres e a infraestrutura em nuvem, verificando como elas podem ser combinadas para fornecer soluções escaláveis e eficientes no desenvolvimento de uma aplicação web.
 
 ## Stack da Aplicação
 
